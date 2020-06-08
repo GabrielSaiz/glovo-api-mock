@@ -35,8 +35,10 @@ import com.grsm.poc.glovo.api.entity.State;
 import com.grsm.poc.glovo.api.entity.Total;
 import com.grsm.poc.glovo.api.entity.mock.OrderMock;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/b2b/orders")
@@ -99,6 +101,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
+    @Operation(summary = "Provide a price estimation for an order.", security = @SecurityRequirement(name = "basicAuth"))
     public EstimatePrice estimateOrderPrice(@RequestBody Order order) {
 
         if (order.getScheduleTime() != null) {
@@ -171,6 +174,7 @@ public class OrdersController {
     @ResponseBody
     @PostMapping("/")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Create an order", security = @SecurityRequirement(name = "basicAuth"))
     public Order createOrder(@RequestBody Order order) {
         if ((order == null) || (order.getAddresses() == null) || (order.getAddresses().size() < 2)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order data incomplete");
@@ -295,6 +299,7 @@ public class OrdersController {
     @ResponseBody
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get Single Order", security = @SecurityRequirement(name = "basicAuth"))
     public Order getSingleOrder(@PathVariable String orderId) {
 		Order order = OrderMock.createOrderMock();
 
@@ -323,6 +328,7 @@ public class OrdersController {
     @ResponseBody
     @GetMapping("/{orderId}/tracking")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Return the position (latitude, longitude) of the courier.", security = @SecurityRequirement(name = "basicAuth"))
     public Position getOrderTracking(@PathVariable String orderId) {
         Position position = new Position();
         position.setLat(40.4170769);
@@ -350,6 +356,7 @@ public class OrdersController {
     @ResponseBody
     @GetMapping("/{orderId}/courier-contact")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Name and contact phone of the courier if the order is active. Error if the order is not active.", security = @SecurityRequirement(name = "basicAuth"))
     public Courier getCourierContact(@PathVariable String orderId) {
         Courier courier = new Courier();
         courier.setCourier("Niarudni Leugim");
@@ -378,6 +385,7 @@ public class OrdersController {
     @ResponseBody
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retrieve a list of orders up to the limit count starting from offset in the reverse chronological order.", security = @SecurityRequirement(name = "basicAuth"))
     public Orders getOrdersList(@RequestParam Integer limit, @RequestParam Integer offset) {
 
 		List<Order> lisOrders = new ArrayList<Order>();
@@ -439,6 +447,7 @@ public class OrdersController {
     @ResponseBody
     @PostMapping("/{orderId}/cancel")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Cancel a scheduled order. Active orders cannot be canceled.", security = @SecurityRequirement(name = "basicAuth"))
     public Order cancelOrder(@PathVariable String orderId) {
 		Order order = OrderMock.createOrderMock();
 
